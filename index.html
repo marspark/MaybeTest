@@ -29,14 +29,19 @@
                 <a href="#" data-bind="click: function() { $parent.getFilteredItems(identifier) }"><span data-bind="text:name"></span></a>
             </div>
             <div id="content">
-                <div class="thumbnail-nav"><a id="carousel-prev" href="#"><img src="img/left-arrow.gif" id="thumbnails-prev" /></a></div>
-                <div id="container">
-                    <div id="thumbnails" class="rs-carousel">
-                        <ul data-bind="template:{name:templateCallback, foreach:dataList, afterAdd:showMakeup}"></ul>
+                <div class="layout-paging">
+                    <div class="thumbnail-nav"><a id="carousel-prev" href="#"><img src="img/left-arrow.gif" id="thumbnails-prev" /></a></div>
+                    <div class="container">
+                        <div class="thumbnails rs-carousel">
+                            <ul data-bind="template:{name:templateLayoutPaging, foreach:dataList, afterAdd:showMakeup}"></ul>
+                        </div>
+                        <!--<div id="loader"><img src="img/ajax-loader.gif" /></div>-->
                     </div>
-                    <!--<div id="loader"><img src="img/ajax-loader.gif" /></div>-->
+                    <div class="thumbnail-nav"><a id="carousel-next" href="#"><img src="img/right-arrow.gif" id="thumbnails-next" /></a></div>
                 </div>
-                <div class="thumbnail-nav"><a id="carousel-next" href="#"><img src="img/right-arrow.gif" id="thumbnails-next" /></a></div>
+                <div class="layout-show-more">
+                    <div class="container" data-bind="template:{name:templateLayoutShowMore, foreach:dataList, afterAdd:showMakeup}"></div>
+                </div>
             </div>
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

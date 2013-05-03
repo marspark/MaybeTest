@@ -142,20 +142,20 @@ textarea {
     max-width: 100%;
 }
 
-#content #container{
+#content .container{
     position: relative;
     width:80%;
     max-width:800px;
     float:left;
 }
 
-#content #container #thumbnails{
+#content .container .thumbnails{
     width:800px;
     text-align:center;
     overflow: hidden;
 }
 
-#content #container #thumbnails .item{
+#content .layout-paging .container .thumbnails .item{
     border:1px solid #fff;
     background:#999;
     zoom: 1;
@@ -167,7 +167,7 @@ textarea {
     float:left;
 }
 
-#content #container #thumbnails .item .overlay{
+#content .container .thumbnails .item .overlay{
     position:absolute;
     color:#fff;
     width:100%;
@@ -176,7 +176,7 @@ textarea {
     cursor: pointer;
 }
 
-#content #container #thumbnails .item .overlay .top{
+#content .container .thumbnails .item .overlay .top{
     background:rgba(0, 0, 0, 0.3);
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#33000000, endColorstr=#33000000);
     /* For IE 8*/
@@ -187,12 +187,12 @@ textarea {
     font:1em
 }
 
-#content #container #thumbnails .item .overlay .top .title{
+#content .container .thumbnails .item .overlay .top .title{
     text-align:left;
     margin:3px 0 0 10px;
 }
 
-#content #container #thumbnails .item .overlay .bottom{
+#content .container .thumbnails .item .overlay .bottom{
     position:absolute;
     bottom: 0;
     background:rgba(0, 0, 0, 0.3);
@@ -204,24 +204,24 @@ textarea {
     font-size:0.8em;
 }
 
-#content #container #thumbnails .item .overlay .bottom .likes{
+#content .container .thumbnails .item .overlay .bottom .likes{
     float:left;
     padding-left:20px;
     margin:7px 0 0 5px;
 }
 
-#content #container #thumbnails .item .overlay .bottom .comments{
+#content .container .thumbnails .item .overlay .bottom .comments{
     float:right;
     padding-left:20px;
     margin:7px 5px 0 0;
 }
 
-#content #container #thumbnails .item img{
+#content .container .thumbnails .item img{
     /*min-width: 100%;
     max-width: 100%;*/
 }
 
-#content #container #loader{
+#content .container #loader{
     width:100%;
     text-align: center
 }
@@ -350,13 +350,13 @@ ul li.rs-carousel-item {
 }
 
 @media screen and (max-width: 600px) {
-    #thumbnails .item{
+    .thumbnails .item{
         width:32%;
     }
 }
 
 @media only screen and (max-width : 480px) {
-    #thumbnails .item{
+    .thumbnails .item{
         width:48%;
     }
 }
