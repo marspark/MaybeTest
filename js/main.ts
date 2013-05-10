@@ -78,39 +78,39 @@ module Maybelline {
                 '<li>' +
                     '{{#page}}' +
                     '<div class="item" data-url="{{mbllink}}">' +
-                    '<div class="overlay">' +
-                    '<div class="top">' +
-                    '<div class="title">{{description}}</div>' +
-                    '</div>' +
-                    '<div class="bottom">' +
-                    '<div class="likes">{{mblflowers}}</div>' +
-                    '<div class="comments">{{mblcoments}}</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' +
+                        '<div class="overlay">' +
+                            '<div class="top">' +
+                                '<div class="title">{{description}}</div>' +
+                            '</div>' +
+                            '<div class="bottom">' +
+                                '<div class="likes">{{mblflowers}}</div>' +
+                                '<div class="comments">{{mblcoments}}</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' +
                     '</div>' +
                     '{{/page}}' +
-                    '</li>';
+                '</li>';
             return Hogan.compile(designTemplate);
         }
 
         // html pre-compiled template
         templateLayoutShowMore(){
             var designTemplate:string  =
-                    '{{#page}}' +
-                    '<div class="item" data-url="{{mbllink}}">' +
+                '{{#page}}' +
+                '<div class="item" data-url="{{mbllink}}">' +
                     '<div class="overlay">' +
-                    '<div class="top">' +
-                    '<div class="title">{{description}}</div>' +
-                    '</div>' +
-                    '<div class="bottom">' +
-                    '<div class="likes">{{mblflowers}}</div>' +
-                    '<div class="comments">{{mblcoments}}</div>' +
-                    '</div>' +
+                        '<div class="top">' +
+                            '<div class="title">{{description}}</div>' +
+                        '</div>' +
+                        '<div class="bottom">' +
+                            '<div class="likes">{{mblflowers}}</div>' +
+                            '<div class="comments">{{mblcoments}}</div>' +
+                        '</div>' +
                     '</div>' +
                     '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' +
-                    '</div>' +
-                    '{{/page}}';
+                '</div>' +
+                '{{/page}}';
             return Hogan.compile(designTemplate);
         }
 
