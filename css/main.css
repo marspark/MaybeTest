@@ -155,7 +155,7 @@ textarea {
     overflow: hidden;
 }
 
-#content .layout-paging .container .thumbnails .item{
+#content #layout-scroller .container .thumbnails .item{
     border:1px solid #fff;
     background:#999;
     zoom: 1;

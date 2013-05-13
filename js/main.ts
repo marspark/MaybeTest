@@ -3,9 +3,9 @@
 // TODO: show more button to load more pages in 'showmore' layout
 // TODO: unit testing, jasmin/buster
 // TODO: build script node.js?
+// TODO: free fish
 
 // Whole-script strict mode syntax
-"use strict";
 
 module Maybelline {
     // manages all service including ajax calls
@@ -14,16 +14,46 @@ module Maybelline {
         constructor() {
             this._baseUrl = 'http://10.5.30.109:8093/';
         }
-        getAllItemsByPage( url:string, lastId:number, numberOfItems:number, tag:string, vm:Maybelline.DefaultViewModel, succssCallback:string, errorCallback:string) {
+
+        getAllItems( url:string, numberOfItemsPerPage:number, tag:string, vm:Maybelline.DefaultViewModel, succssCallback:string, errorCallback:string) {
             $('#loader').show();
-            var returnData = [];
+            var returnData:IPages;
             $.ajax({
                 //url: this._baseUrl + url,
-                url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
+                //url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
+                url: "data/data.txt",
+                type: "GET",
+                data: {
+                    number: numberOfItemsPerPage,
+                    tags: tag
+                },
+                async: false,
+                dataType:'jsonp',
+                jsonpCallback: 'jsonCallback',
+                contentType: "application/json",
+                timeout : 10000,
+                success:function(response) {
+                    $('#loader').hide();
+                    returnData = <IPages>response;
+                    vm[succssCallback](returnData);
+                },
+                error:function(error:any) {
+                    vm[errorCallback](error);
+                }
+            });
+        }
+
+        getItemsByPage( url:string, lastId:number, numberOfItemsPerPage:number, tag:string, vm:Maybelline.DefaultViewModel, succssCallback:string, errorCallback:string) {
+            $('#loader').show();
+            var returnData:IPages;
+            $.ajax({
+                //url: this._baseUrl + url,
+                //url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
+                url: "data/data.txt",
                 type: "GET",
                 data: {
                     id: lastId,
-                    number: numberOfItems,
+                    number: numberOfItemsPerPage,
                     tags: tag
                 },
                 async: false,
@@ -50,18 +80,20 @@ module Maybelline {
         private _serviceManager:Maybelline.ServiceManager;
         private _lastId:number;
         private _currentFilter:string;
-        private _currentNumOfItems:number;
         private _currentIndex:number;
         private _currentTotalPages:number;
+
+        private _numOfItemsPagingLayout:number;
+        private _numOfItemsScrollerLayout:number;
 
         constructor(){
             this._serviceManager = new ServiceManager();
 
             this.tagList = ko.observableArray([
-                <ITag>{'name':'Tag1', 'identifier':'mm'},
-                <ITag>{'name':'Tag2', 'identifier':'tag2'},
-                <ITag>{'name':'Tag3', 'identifier':'tag3'},
-                <ITag>{'name':'Tag4', 'identifier':'tag4'}
+                <ITag>{'name':'Tag1', 'identifier':'mm', 'layout':'scroller'},
+                <ITag>{'name':'Tag2', 'identifier':'tag2', 'layout':'paging'},
+                <ITag>{'name':'Tag3', 'identifier':'tag3', 'layout':'paging'},
+                <ITag>{'name':'Tag4', 'identifier':'tag4', 'layout':'paging'}
             ]);
             this.dataList = ko.observableArray();
             this._currentIndex = 1;
@@ -69,11 +101,12 @@ module Maybelline {
 
             this._lastId = 0;
             this._currentFilter = '';
-            this._currentNumOfItems = 20;
+            this._numOfItemsScrollerLayout = 8;
+            this._numOfItemsPagingLayout = 16;
         }
 
         // html pre-compiled template
-        templateLayoutPaging(){
+        templateScrollerLayout(){
             var designTemplate:string  =
                 '<li>' +
                     '{{#page}}' +
@@ -95,44 +128,66 @@ module Maybelline {
         }
 
         // html pre-compiled template
-        templateLayoutShowMore(){
+        templatePagingLayout(){
             var designTemplate:string  =
                 '{{#page}}' +
-                '<div class="item" data-url="{{mbllink}}">' +
-                    '<div class="overlay">' +
-                        '<div class="top">' +
-                            '<div class="title">{{description}}</div>' +
+                    '<div class="item" data-url="{{mbllink}}">' +
+                        '<div class="overlay">' +
+                            '<div class="top">' +
+                                '<div class="title">{{description}}</div>' +
+                            '</div>' +
+                            '<div class="bottom">' +
+                                '<div class="likes">{{mblflowers}}</div>' +
+                                '<div class="comments">{{mblcoments}}</div>' +
+                            '</div>' +
                         '</div>' +
-                        '<div class="bottom">' +
-                            '<div class="likes">{{mblflowers}}</div>' +
-                            '<div class="comments">{{mblcoments}}</div>' +
-                        '</div>' +
+                        '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' +
                     '</div>' +
-                    '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' +
-                '</div>' +
                 '{{/page}}';
             return Hogan.compile(designTemplate);
         }
 
         // get items (initial load)
         getDefaultItems(){
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._currentNumOfItems, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsScrollerLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        }
+
+        // get filtered items
+        getFilteredItems(identifier:string, layout:string){
+            this.dataList = ko.observableArray();
+
+            this._currentFilter = identifier;
+
+            if(layout === "scroller"){
+                // scroller layout
+                $('#layout-scroller').show();
+                $('#layout-paging').hide();
+
+                this._serviceManager.getAllItems('AjaxMakeup.GetMakeupList.dubing', this._numOfItemsScrollerLayout, this._currentFilter, this, 'filteredItemsSuccess', 'filteredItemsError');
+            }else{
+                // paging layout
+                $('#layout-paging').show();
+                $('#layout-scroller').hide();
+
+                this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsPagingLayout, this._currentFilter, this, 'filteredItemsSuccess', 'filteredItemsError');
+            }
         }
 
         // get more items
         getMoreItems(){
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this._currentNumOfItems, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this._numOfItemsPagingLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
         }
 
         getItemsSuccess(data:IPages){
+            this._lastId = data[data.length - 1].id;
+            this._currentTotalPages = data.totalPages;
+
             var pageData:IPage;
 
             for(var i = 0; i < data.pages.length; i++){
                 pageData = data.pages[i];
                 this.dataList.push(pageData);
             }
-
-            this._currentTotalPages = data.totalPages;
 
             applyCarousel(this);
             applyLazyLoading();
@@ -141,33 +196,6 @@ module Maybelline {
 
         getItemsError(error:any){
             console.log(error.message)
-        }
-
-        // get filtered items
-        getFilteredItems(identifier:string){
-            this._currentFilter = identifier;
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._currentNumOfItems, this._currentFilter, this, 'filteredItemsSuccess', 'filteredItemsError');
-        }
-
-        filteredItemsSuccess(data:IMakeup){
-            this._lastId = data[data.length - 1].id;
-
-            for(var i = 0; i < this.dataList().length; i++){
-                var oldData:IMakeup = this.dataList()[i];
-
-                var found = $.grep(data, function(n:IMakeup){return n.id === oldData.id});
-
-                if(found.length < 1){
-                    this.dataList.remove(oldData);
-                    i--;
-                }
-            }
-            applyLazyLoading();
-            applyLink();
-        }
-
-        filteredItemsError(data:any){
-            console.log(data.message);
         }
 
         showMakeup(elem:any){
@@ -225,7 +253,7 @@ module Maybelline {
         })
     }
 
-    interface IMakeup{
+    export interface IMakeup{
         id:number;
         imageupload:string;
         mblflowers:number;
@@ -237,18 +265,19 @@ module Maybelline {
     }
 
     // ipage interface is needed for generating templates
-    interface IPage{
+    export interface IPage{
         page:IMakeup;
     }
 
-    interface IPages{
+    export interface IPages{
         pages:IPage[];
         totalPages:number;
     }
 
-    interface ITag{
+    export interface ITag{
         name:string;
         identifier:string;
+        layout:string;
     }
 }
 
@@ -266,5 +295,9 @@ function init(){
 
     $('#carousel-next').bind('click', function(){
         defaultVM.loadNextPage();
+    });
+
+    $('#show-more-button').bind('click', function(){
+        defaultVM.getMoreItems();
     });
 }

@@ -26,29 +26,34 @@
         <div id="wrapper">
             <div id="header"></div>
             <div id="nav" data-bind="foreach:tagList">
-                <a href="#" data-bind="click: function() { $parent.getFilteredItems(identifier) }"><span data-bind="text:name"></span></a>
+                <a href="#" data-bind="click: function() { $parent.getFilteredItems(identifier, layout) }"><span data-bind="text:name"></span></a>
             </div>
             <div id="content">
-                <div class="layout-paging">
+                <div id="layout-scroller">
                     <div class="thumbnail-nav"><a id="carousel-prev" href="#"><img src="img/left-arrow.gif" id="thumbnails-prev" /></a></div>
                     <div class="container">
                         <div class="thumbnails rs-carousel">
-                            <ul data-bind="template:{name:templateLayoutPaging, foreach:dataList, afterAdd:showMakeup}"></ul>
+                            <ul data-bind="template:{name:templateScrollerLayout, foreach:dataList, afterAdd:showMakeup}"></ul>
                         </div>
                         <!--<div id="loader"><img src="img/ajax-loader.gif" /></div>-->
                     </div>
                     <div class="thumbnail-nav"><a id="carousel-next" href="#"><img src="img/right-arrow.gif" id="thumbnails-next" /></a></div>
                 </div>
-                <div class="layout-show-more">
-                    <div class="container" data-bind="template:{name:templateLayoutShowMore, foreach:dataList, afterAdd:showMakeup}"></div>
+                <div id="layout-paging">
+                    <div class="container" data-bind="template:{name:templatePagingLayout, foreach:dataList, afterAdd:showMakeup}"></div>
+                    <div class="show-more"><a href="#" id="show-more-button">Show More</a></div>
                 </div>
             </div>
         </div>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
 
         <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
-        <script src="http://twitter.github.io/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>
+        <script src="http://twitter.github.io/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>-->
+
+        <script src="js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="js/vendor/knockout-2.2.1.js"></script>
+        <script src="js/vendor/hogan-2.0.0.js"></script>
         <script src="js/vendor/ko.template-engine.hogan-0.1.0.min.js"></script>
         <script src="js/vendor/jail.js"></script>
         <script src="js/vendor/jquery.ui.widget.js"></script>
@@ -58,12 +63,5 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
 
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
-            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src='//www.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script>
     </body>
 </html>
