@@ -52,7 +52,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             if (this.options.continuous) {
                 this._addClonedItems();
                 this._setRunnerWidth();
-                // jump to current page to avoid clones noting the carousel
+                // jump to current makeups to avoid clones noting the carousel
                 // needs to be enabled beforehand
                 this.enable();
                 this.goToPage(this.index, false, undefined, true);
@@ -149,16 +149,16 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
 
             if (this.options.continuous) {
 
-                // if moving to first page
+                // if moving to first makeups
                 if (e.type === 'carousel:next' && this.index === 0) {
-                    // jump to last page clone
+                    // jump to last makeups clone
                     pos = this.elements.clonedEnd
                         .first()
                             .position()[this.isHorizontal ? 'left' : 'top'];
                 }
-                // if moving to last page
+                // if moving to last makeups
                 else if (e.type === 'carousel:prev' && this.index === this.getNoOfPages() - 1) {
-                    // jump to first page clone
+                    // jump to first makeups clone
                     pos = this.elements.clonedBeginning
                         .first()
                             .position()[this.isHorizontal ? 'left' : 'top'];

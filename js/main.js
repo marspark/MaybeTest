@@ -1,19 +1,48 @@
-"use strict";
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Maybelline;
 (function (Maybelline) {
     var ServiceManager = (function () {
         function ServiceManager() {
             this._baseUrl = 'http://10.5.30.109:8093/';
         }
-        ServiceManager.prototype.getAllItemsByPage = function (url, lastId, numberOfItems, tag, vm, succssCallback, errorCallback) {
+        ServiceManager.prototype.getAllItems = function (url, numberOfItemsPerPage, tag, vm, succssCallback, errorCallback) {
             $('#loader').show();
-            var returnData = [];
+            var returnData;
+            $.ajax({
+                url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
+                type: "GET",
+                data: {
+                    number: numberOfItemsPerPage,
+                    tags: tag
+                },
+                async: false,
+                dataType: 'jsonp',
+                jsonpCallback: 'jsonCallback',
+                contentType: "application/json",
+                timeout: 10000,
+                success: function (response) {
+                    $('#loader').hide();
+                    returnData = response;
+                    vm[succssCallback](returnData);
+                },
+                error: function (error) {
+                    vm[errorCallback](error);
+                }
+            });
+        };
+        ServiceManager.prototype.getItemsByPage = function (url, lastId, numberOfItemsPerPage, tag, vm, succssCallback, errorCallback) {
+            $('#loader').show();
+            var returnData;
             $.ajax({
                 url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
                 type: "GET",
                 data: {
                     id: lastId,
-                    number: numberOfItems,
+                    number: numberOfItemsPerPage,
                     tags: tag
                 },
                 async: false,
@@ -34,108 +63,137 @@ var Maybelline;
         return ServiceManager;
     })();
     Maybelline.ServiceManager = ServiceManager;    
-    var DefaultViewModel = (function () {
-        function DefaultViewModel() {
+    var TagsModel = (function () {
+        function TagsModel() {
             this._serviceManager = new ServiceManager();
             this.tagList = ko.observableArray([
                 {
                     'name': 'Tag1',
-                    'identifier': 'mm'
+                    'identifier': 'mm',
+                    'layout': Maybelline.LayoutDataType.scroller
                 }, 
                 {
                     'name': 'Tag2',
-                    'identifier': 'tag2'
+                    'identifier': 'tag2',
+                    'layout': Maybelline.LayoutDataType.paging
                 }, 
                 {
                     'name': 'Tag3',
-                    'identifier': 'tag3'
+                    'identifier': 'tag3',
+                    'layout': Maybelline.LayoutDataType.paging
                 }, 
                 {
                     'name': 'Tag4',
-                    'identifier': 'tag4'
+                    'identifier': 'tag4',
+                    'layout': Maybelline.LayoutDataType.paging
                 }
             ]);
+        }
+        return TagsModel;
+    })();
+    Maybelline.TagsModel = TagsModel;    
+    var LooksScrollerModel = (function (_super) {
+        __extends(LooksScrollerModel, _super);
+        function LooksScrollerModel() {
+                _super.call(this);
+        }
+        return LooksScrollerModel;
+    })(Maybelline.LooksBaseModel);
+    Maybelline.LooksScrollerModel = LooksScrollerModel;    
+    var LooksBaseModel = (function () {
+        function LooksBaseModel() {
+            this._serviceManager = new ServiceManager();
             this.dataList = ko.observableArray();
             this._currentIndex = 1;
             this._currentTotalPages = 20;
             this._lastId = 0;
             this._currentFilter = '';
-            this._currentNumOfItems = 20;
+            this._currentSortBy = Maybelline.SortByDataType.all;
+            this._numOfItemsScrollerLayout = 8;
+            this._numOfItemsPagingLayout = 16;
         }
-        DefaultViewModel.prototype.templateLayoutPaging = function () {
-            var designTemplate = '<li>' + '{{#page}}' + '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>' + '{{/page}}' + '</li>';
+        LooksBaseModel.prototype.templateScrollerLayout = function () {
+            var designTemplate = '<li>' + '{{#makeups}}' + '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>' + '{{/makeups}}' + '</li>';
             return Hogan.compile(designTemplate);
         };
-        DefaultViewModel.prototype.templateLayoutShowMore = function () {
-            var designTemplate = '{{#page}}' + '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>' + '{{/page}}';
+        LooksBaseModel.prototype.templatePagingLayout = function () {
+            var designTemplate = '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>';
             return Hogan.compile(designTemplate);
         };
-        DefaultViewModel.prototype.getDefaultItems = function () {
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._currentNumOfItems, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        LooksBaseModel.prototype.getDefaultItems = function () {
+            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsScrollerLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
         };
-        DefaultViewModel.prototype.getMoreItems = function () {
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this._currentNumOfItems, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        LooksBaseModel.prototype.getFilteredItems = function (identifier, layout) {
+            this.dataList = ko.observableArray();
+            this._currentFilter = identifier;
+            if(layout === Maybelline.LayoutDataType.scroller) {
+                $('#layout-scroller').show();
+                $('#layout-paging').hide();
+                this._serviceManager.getAllItems('AjaxMakeup.GetMakeupList.dubing', this._numOfItemsScrollerLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+            } else if(layout === Maybelline.LayoutDataType.paging) {
+                $('#layout-paging').show();
+                $('#layout-scroller').hide();
+                this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsPagingLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+            }
         };
-        DefaultViewModel.prototype.getItemsSuccess = function (data) {
+        LooksBaseModel.prototype.getMoreItems = function () {
+            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this._numOfItemsPagingLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        };
+        LooksBaseModel.prototype.getItemsSuccess = function (data) {
+            var lastPage = data.pages[data.pages.length - 1];
+            this._lastId = lastPage.makeups[lastPage.makeups.length - 1].id;
+            this._currentTotalPages = data.totalPages;
             var pageData;
             for(var i = 0; i < data.pages.length; i++) {
                 pageData = data.pages[i];
                 this.dataList.push(pageData);
             }
-            this._currentTotalPages = data.totalPages;
             applyCarousel(this);
             applyLazyLoading();
             applyLink();
         };
-        DefaultViewModel.prototype.getItemsError = function (error) {
+        LooksBaseModel.prototype.getItemsError = function (error) {
             console.log(error.message);
         };
-        DefaultViewModel.prototype.getFilteredItems = function (identifier) {
-            this._currentFilter = identifier;
-            this._serviceManager.getAllItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._currentNumOfItems, this._currentFilter, this, 'filteredItemsSuccess', 'filteredItemsError');
-        };
-        DefaultViewModel.prototype.filteredItemsSuccess = function (data) {
-            this._lastId = data[data.length - 1].id;
-            for(var i = 0; i < this.dataList().length; i++) {
-                var oldData = this.dataList()[i];
-                var found = $.grep(data, function (n) {
-                    return n.id === oldData.id;
-                });
-                if(found.length < 1) {
-                    this.dataList.remove(oldData);
-                    i--;
-                }
-            }
-            applyLazyLoading();
-            applyLink();
-        };
-        DefaultViewModel.prototype.filteredItemsError = function (data) {
-            console.log(data.message);
-        };
-        DefaultViewModel.prototype.showMakeup = function (elem) {
+        LooksBaseModel.prototype.showMakeup = function (elem) {
             if(elem.nodeType === 1) {
             }
         };
-        DefaultViewModel.prototype.loadPreviousPage = function () {
+        LooksBaseModel.prototype.loadPreviousPage = function () {
             this._currentIndex--;
             if(this._currentIndex < 1) {
                 this._currentIndex = this._currentTotalPages;
             }
             $(':rs-carousel').carousel('prev');
         };
-        DefaultViewModel.prototype.loadNextPage = function () {
+        LooksBaseModel.prototype.loadNextPage = function () {
             if(this._currentIndex === this._currentTotalPages) {
                 this._currentIndex = 0;
             }
             this._currentIndex++;
             $(':rs-carousel').carousel('next');
         };
-        DefaultViewModel.prototype.loadImagesInCurrentPage = function () {
+        LooksBaseModel.prototype.loadImagesInCurrentPage = function () {
             console.log(this._currentIndex);
         };
-        return DefaultViewModel;
+        return LooksBaseModel;
     })();
-    Maybelline.DefaultViewModel = DefaultViewModel;    
+    Maybelline.LooksBaseModel = LooksBaseModel;    
+    var LayoutDataType = (function () {
+        function LayoutDataType() { }
+        LayoutDataType.paging = "PAGING";
+        LayoutDataType.scroller = "SCROLLER";
+        return LayoutDataType;
+    })();
+    Maybelline.LayoutDataType = LayoutDataType;    
+    var SortByDataType = (function () {
+        function SortByDataType() { }
+        SortByDataType.all = "ALL";
+        SortByDataType.latest = "LATEST";
+        SortByDataType.popular = "POPULAR";
+        return SortByDataType;
+    })();
+    Maybelline.SortByDataType = SortByDataType;    
     function applyCarousel(vm) {
         $('.rs-carousel').carousel({
             continuous: true,
@@ -163,14 +221,19 @@ var Maybelline;
 })(Maybelline || (Maybelline = {}));
 $(document).ready(init);
 function init() {
-    var defaultVM = new Maybelline.DefaultViewModel();
-    ko.applyBindings(defaultVM);
-    defaultVM.getDefaultItems();
+    var looksModel = new Maybelline.LooksScrollerModel();
+    ko.applyBindings(looksModel, $('#content'));
+    var tagsModel = new Maybelline.TagsModel();
+    ko.applyBindings(tagsModel, $('#nav'));
+    looksModel.getDefaultItems();
     $('#carousel-prev').bind('click', function () {
-        defaultVM.loadPreviousPage();
+        looksModel.loadPreviousPage();
     });
     $('#carousel-next').bind('click', function () {
-        defaultVM.loadNextPage();
+        looksModel.loadNextPage();
+    });
+    $('#show-more-button > a').bind('click', function () {
+        looksModel.getMoreItems();
     });
 }
 //@ sourceMappingURL=main.js.map

@@ -1,6 +1,6 @@
 jsonCallback({
     "pages": [{
-        "page":[{
+        "makeups":[{
             "imageupload": "http://placehold.it/245x245",
             "mblflowers": 111,
             "mblcoments": 1111,
@@ -56,7 +56,7 @@ jsonCallback({
             "description":"title text"
         }]
     },{
-        "page":[{
+        "makeups":[{
             "imageupload": "http://placehold.it/245x245",
             "mblflowers": 111,
             "mblcoments": 1111,
