@@ -30,10 +30,19 @@
                 <div id="search"></div>
                 <div id="nav"><a href="index.html">HOME</a> | <a href="makeUpLooksLanding.html">MAKE UP LOOKS</a></div>
             </div>
+            <div id="tags" data-bind="foreach:tagList">
+                <a href="#" data-bind="click: function() { $parent.getFilteredItems(identifier) }"><span data-bind="text:name"></span></a>
+            </div>
             <div id="content">
-                <div id="promo-video"></div>
-                <div id="editorial-looks"></div>
-                <div id="join-us"></div>
+                <div id="layout-scroller">
+                    <div class="thumbnail-nav"><a id="carousel-prev" href="#"><img src="img/left-arrow.gif" id="thumbnails-prev" /></a></div>
+                    <div class="container rs-carousel">
+                        <ul data-bind="template:{name:template, foreach:dataList, afterAdd:showMakeup}"></ul>
+
+                        <div id="loader"><img src="img/ajax-loader.gif" /></div>
+                    </div>
+                    <div class="thumbnail-nav"><a id="carousel-next" href="#"><img src="img/right-arrow.gif" id="thumbnails-next" /></a></div>
+                </div>
             </div>
             <div id="footer"></div>
         </div>

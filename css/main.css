@@ -113,14 +113,14 @@ textarea {
     float:left;
 }
 
-#nav{
+#tags{
     width:100%;
     max-width: 1000px;
     float:left;
     padding:10px;
 }
 
-#nav a{
+#tags a{
     padding-right:10px;
     color:#fff;
 }

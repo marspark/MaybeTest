@@ -30,10 +30,14 @@
                 <div id="search"></div>
                 <div id="nav"><a href="index.html">HOME</a> | <a href="makeUpLooksLanding.html">MAKE UP LOOKS</a></div>
             </div>
+            <div id="tags" data-bind="foreach:tagList">
+                <a href="#" data-bind="click: function() { $parent.getFilteredItems(identifier) }"><span data-bind="text:name"></span></a>
+            </div>
             <div id="content">
-                <div id="promo-video"></div>
-                <div id="editorial-looks"></div>
-                <div id="join-us"></div>
+                <div id="layout-paging">
+                    <div class="container" data-bind="template:{name:template, foreach:dataList, afterAdd:showMakeup}"></div>
+                    <div id="show-more-button"><a>Show More</a></div>
+                </div>
             </div>
             <div id="footer"></div>
         </div>

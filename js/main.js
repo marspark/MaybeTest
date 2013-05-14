@@ -7,7 +7,7 @@ var Maybelline;
 (function (Maybelline) {
     var ServiceManager = (function () {
         function ServiceManager() {
-            this._baseUrl = 'http://10.5.30.109:8093/';
+            this._baseUrl = 'http://10.5.30.109:8071';
         }
         ServiceManager.prototype.getAllItems = function (url, numberOfItemsPerPage, tag, vm, succssCallback, errorCallback) {
             $('#loader').show();
@@ -38,7 +38,7 @@ var Maybelline;
             $('#loader').show();
             var returnData;
             $.ajax({
-                url: "http://test.localhost/MaybellineWebRevamp/data/data.txt",
+                url: "http://test.localhost/MaybellineWebRevamp/data/dataLooks.txt",
                 type: "GET",
                 data: {
                     id: lastId,
@@ -69,88 +69,42 @@ var Maybelline;
             this.tagList = ko.observableArray([
                 {
                     'name': 'Tag1',
-                    'identifier': 'mm',
-                    'layout': Maybelline.LayoutDataType.scroller
+                    'identifier': 'mm'
                 }, 
                 {
                     'name': 'Tag2',
-                    'identifier': 'tag2',
-                    'layout': Maybelline.LayoutDataType.paging
+                    'identifier': 'tag2'
                 }, 
                 {
                     'name': 'Tag3',
-                    'identifier': 'tag3',
-                    'layout': Maybelline.LayoutDataType.paging
+                    'identifier': 'tag3'
                 }, 
                 {
                     'name': 'Tag4',
-                    'identifier': 'tag4',
-                    'layout': Maybelline.LayoutDataType.paging
+                    'identifier': 'tag4'
                 }
             ]);
         }
+        TagsModel.prototype.getFilteredItems = function (key) {
+            this.currentLooksModel.getDefaultItems(key);
+        };
         return TagsModel;
     })();
     Maybelline.TagsModel = TagsModel;    
-    var LooksScrollerModel = (function (_super) {
-        __extends(LooksScrollerModel, _super);
-        function LooksScrollerModel() {
-                _super.call(this);
-        }
-        return LooksScrollerModel;
-    })(Maybelline.LooksBaseModel);
-    Maybelline.LooksScrollerModel = LooksScrollerModel;    
     var LooksBaseModel = (function () {
         function LooksBaseModel() {
-            this._serviceManager = new ServiceManager();
+            this.serviceManager = new ServiceManager();
             this.dataList = ko.observableArray();
-            this._currentIndex = 1;
-            this._currentTotalPages = 20;
-            this._lastId = 0;
-            this._currentFilter = '';
-            this._currentSortBy = Maybelline.SortByDataType.all;
-            this._numOfItemsScrollerLayout = 8;
-            this._numOfItemsPagingLayout = 16;
+            this.currentFilter = '';
+            this.currentSortBy = SortByDataType.all;
+            this.numOfItems = 8;
         }
-        LooksBaseModel.prototype.templateScrollerLayout = function () {
-            var designTemplate = '<li>' + '{{#makeups}}' + '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>' + '{{/makeups}}' + '</li>';
+        LooksBaseModel.prototype.template = function () {
+            var designTemplate = '';
             return Hogan.compile(designTemplate);
         };
-        LooksBaseModel.prototype.templatePagingLayout = function () {
-            var designTemplate = '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '<div class="comments">{{mblcoments}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>';
-            return Hogan.compile(designTemplate);
-        };
-        LooksBaseModel.prototype.getDefaultItems = function () {
-            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsScrollerLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
-        };
-        LooksBaseModel.prototype.getFilteredItems = function (identifier, layout) {
-            this.dataList = ko.observableArray();
-            this._currentFilter = identifier;
-            if(layout === Maybelline.LayoutDataType.scroller) {
-                $('#layout-scroller').show();
-                $('#layout-paging').hide();
-                this._serviceManager.getAllItems('AjaxMakeup.GetMakeupList.dubing', this._numOfItemsScrollerLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
-            } else if(layout === Maybelline.LayoutDataType.paging) {
-                $('#layout-paging').show();
-                $('#layout-scroller').hide();
-                this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this._numOfItemsPagingLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
-            }
-        };
-        LooksBaseModel.prototype.getMoreItems = function () {
-            this._serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this._numOfItemsPagingLayout, this._currentFilter, this, 'getItemsSuccess', 'getItemsError');
-        };
-        LooksBaseModel.prototype.getItemsSuccess = function (data) {
-            var lastPage = data.pages[data.pages.length - 1];
-            this._lastId = lastPage.makeups[lastPage.makeups.length - 1].id;
-            this._currentTotalPages = data.totalPages;
-            var pageData;
-            for(var i = 0; i < data.pages.length; i++) {
-                pageData = data.pages[i];
-                this.dataList.push(pageData);
-            }
-            applyCarousel(this);
-            applyLazyLoading();
-            applyLink();
+        LooksBaseModel.prototype.getDefaultItems = function (key) {
+            this.currentFilter = key;
         };
         LooksBaseModel.prototype.getItemsError = function (error) {
             console.log(error.message);
@@ -159,33 +113,93 @@ var Maybelline;
             if(elem.nodeType === 1) {
             }
         };
-        LooksBaseModel.prototype.loadPreviousPage = function () {
+        return LooksBaseModel;
+    })();
+    Maybelline.LooksBaseModel = LooksBaseModel;    
+    var LooksPagingModel = (function (_super) {
+        __extends(LooksPagingModel, _super);
+        function LooksPagingModel() {
+                _super.call(this);
+            this._lastId = 0;
+            this.numOfItems = 24;
+        }
+        LooksPagingModel.prototype.template = function () {
+            var designTemplate = '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>';
+            return Hogan.compile(designTemplate);
+        };
+        LooksPagingModel.prototype.getDefaultItems = function (key) {
+            _super.prototype.getDefaultItems.call(this, key);
+            this.serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', 1, this.numOfItems, this.currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        };
+        LooksPagingModel.prototype.getItemsSuccess = function (data) {
+            this._lastId = data.looks[data.looks.length - 1].id;
+            var lookData;
+            for(var i = 0; i < data.looks.length; i++) {
+                lookData = data.looks[i];
+                this.dataList.push(lookData);
+            }
+            applyLazyLoading();
+            applyLink();
+        };
+        LooksPagingModel.prototype.getMoreItems = function () {
+            this.serviceManager.getItemsByPage('AjaxMakeup.GetMakeupList.dubing', this._lastId, this.numOfItems, this.currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        };
+        return LooksPagingModel;
+    })(LooksBaseModel);
+    Maybelline.LooksPagingModel = LooksPagingModel;    
+    var LooksScrollerModel = (function (_super) {
+        __extends(LooksScrollerModel, _super);
+        function LooksScrollerModel() {
+                _super.call(this);
+            this._currentIndex = 1;
+            this._currentTotalPages = 3;
+            this.numOfItems = 8;
+        }
+        LooksScrollerModel.prototype.template = function () {
+            var designTemplate = '<li>' + '{{#looks}}' + '<div class="item" data-url="{{mbllink}}">' + '<div class="overlay">' + '<div class="top">' + '<div class="title">{{description}}</div>' + '</div>' + '<div class="bottom">' + '<div class="likes">{{mblflowers}}</div>' + '</div>' + '</div>' + '<img class="lazy" src="img/blank.gif" data-src="{{imageupload}}" />' + '</div>' + '{{/looks}}' + '</li>';
+            return Hogan.compile(designTemplate);
+        };
+        LooksScrollerModel.prototype.getDefaultItems = function (key) {
+            _super.prototype.getDefaultItems.call(this, key);
+            this.serviceManager.getAllItems('AjaxMakeup.GetMakeupList.dubing', this.numOfItems, this.currentFilter, this, 'getItemsSuccess', 'getItemsError');
+        };
+        LooksScrollerModel.prototype.getItemsSuccess = function (data) {
+            var pageData;
+            for(var i = 0; i < data.pages.length; i++) {
+                pageData = data.pages[i];
+                this.dataList.push(pageData);
+            }
+            this._currentTotalPages = data.pages.length;
+            applyCarousel(this);
+            applyLazyLoading();
+            applyLink();
+        };
+        LooksScrollerModel.prototype.loadPreviousPage = function () {
             this._currentIndex--;
             if(this._currentIndex < 1) {
                 this._currentIndex = this._currentTotalPages;
             }
             $(':rs-carousel').carousel('prev');
         };
-        LooksBaseModel.prototype.loadNextPage = function () {
+        LooksScrollerModel.prototype.loadNextPage = function () {
             if(this._currentIndex === this._currentTotalPages) {
                 this._currentIndex = 0;
             }
             this._currentIndex++;
             $(':rs-carousel').carousel('next');
         };
-        LooksBaseModel.prototype.loadImagesInCurrentPage = function () {
+        LooksScrollerModel.prototype.loadImagesInCurrentPage = function () {
             console.log(this._currentIndex);
         };
-        return LooksBaseModel;
+        return LooksScrollerModel;
+    })(LooksBaseModel);
+    Maybelline.LooksScrollerModel = LooksScrollerModel;    
+    var TagDataType = (function () {
+        function TagDataType() { }
+        TagDataType.all = "ALL";
+        return TagDataType;
     })();
-    Maybelline.LooksBaseModel = LooksBaseModel;    
-    var LayoutDataType = (function () {
-        function LayoutDataType() { }
-        LayoutDataType.paging = "PAGING";
-        LayoutDataType.scroller = "SCROLLER";
-        return LayoutDataType;
-    })();
-    Maybelline.LayoutDataType = LayoutDataType;    
+    Maybelline.TagDataType = TagDataType;    
     var SortByDataType = (function () {
         function SortByDataType() { }
         SortByDataType.all = "ALL";
@@ -221,19 +235,28 @@ var Maybelline;
 })(Maybelline || (Maybelline = {}));
 $(document).ready(init);
 function init() {
-    var looksModel = new Maybelline.LooksScrollerModel();
-    ko.applyBindings(looksModel, $('#content'));
     var tagsModel = new Maybelline.TagsModel();
-    ko.applyBindings(tagsModel, $('#nav'));
-    looksModel.getDefaultItems();
-    $('#carousel-prev').bind('click', function () {
-        looksModel.loadPreviousPage();
-    });
-    $('#carousel-next').bind('click', function () {
-        looksModel.loadNextPage();
-    });
-    $('#show-more-button > a').bind('click', function () {
-        looksModel.getMoreItems();
-    });
+    ko.applyBindings(tagsModel, $('#tags')[0]);
+    if($("#layout-scroller").length > 0) {
+        var looksScrollerModel = new Maybelline.LooksScrollerModel();
+        ko.applyBindings(looksScrollerModel, $('#layout-scroller')[0]);
+        tagsModel.currentLooksModel = looksScrollerModel;
+        looksScrollerModel.getDefaultItems(Maybelline.TagDataType.all);
+        $('#carousel-prev').bind('click', function () {
+            looksScrollerModel.loadPreviousPage();
+        });
+        $('#carousel-next').bind('click', function () {
+            looksScrollerModel.loadNextPage();
+        });
+    }
+    if($("#layout-paging").length > 0) {
+        var looksPagingModel = new Maybelline.LooksPagingModel();
+        ko.applyBindings(looksPagingModel, $('#layout-paging')[0]);
+        tagsModel.currentLooksModel = looksPagingModel;
+        looksPagingModel.getDefaultItems(Maybelline.TagDataType.all);
+        $('#show-more-button > a').bind('click', function () {
+            looksPagingModel.getMoreItems();
+        });
+    }
 }
 //@ sourceMappingURL=main.js.map

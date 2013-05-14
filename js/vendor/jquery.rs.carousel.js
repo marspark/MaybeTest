@@ -280,7 +280,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
                 .each(function () {
                     dim += self.isHorizontal ? $(this).outerWidth(true) : $(this).outerHeight(true);
                     if (dim > maskDim) {
-                        // if no items have been pushed to makeups then it means the
+                        // if no items have been pushed to looks then it means the
                         // first item is larger than the mask so we still need to push before
                         // breaking.
                         if (page.length === 0) {
@@ -323,7 +323,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             this._removePagination();
 
             for (i = 0; i < noOfPages; i++) {
-                links[i] = '<li class="' + fullName + '-pagination-link"><a href="#makeups-' + i + '">' + (i + 1) + '</a></li>';
+                links[i] = '<li class="' + fullName + '-pagination-link"><a href="#looks-' + i + '">' + (i + 1) + '</a></li>';
             }
 
             pagination
@@ -355,7 +355,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
 
         },
 
-        // if no of items is less than items on first makeups then the
+        // if no of items is less than items on first looks then the
         // carousel should be disabled.
         _checkDisabled: function () {
 
@@ -488,7 +488,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             return false;
         },
 
-        // returns valid makeups index
+        // returns valid looks index
         _makeValid: function (index) {
 
             if (index < 0) {
@@ -589,7 +589,7 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
             return lastPos < 0 ? undefined : lastPos;
         },
 
-        // returns jQuery object of items on makeups
+        // returns jQuery object of items on looks
         getPage: function (index) {
 
             return this.pages[(typeof index !== 'undefined' ? index : this.index)] || $([]);
