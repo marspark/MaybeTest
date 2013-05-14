@@ -295,7 +295,7 @@
 	* Function that returns true if the image is visible inside the "window" (or specified container element)
 	*
 	* @param $ct : container - jQuery obj
-	* @param $img : image selected - jQuery obj
+	* @param $images : image selected - jQuery obj
 	* @param optionOffset : offset
 	*/
 	function _isInTheScreen ( $ct, $img, optionOffset ) {
@@ -319,7 +319,7 @@
 	* Main function --> Load the images copying the "data-href" attribute into the "src" attribute
 	*
 	* @param options : configurations object
-	* @param $img : image selected - jQuery obj
+	* @param $images : image selected - jQuery obj
 	*/
 	function _loadImage ( options, $img ) {
 
@@ -338,7 +338,7 @@
 				} else {
 					$img[options.effect]();
 				}
-				//$img.css("opacity", 1);
+				//$images.css("opacity", 1);
 				$img.show();
 			} else {
 				$img.show();
@@ -363,7 +363,7 @@
 	* Return if the image is visible inside a "container" / window. There are checks around
 	* "visibility" CSS property and around "overflow" property of the "container"
 	*
-	* @param $img : image selected - jQuery obj
+	* @param $images : image selected - jQuery obj
 	* @param container : container object
 	* @param options : configurations object
 	*/

@@ -1,5 +1,5 @@
 // TODO: overall architecture
-// TODO: build script node.js?
+// TODO: build script node.scripts?
 // TODO: unit testing, jasmin/buster
 
 // Whole-script strict mode syntax
@@ -91,7 +91,7 @@ module Maybelline {
         }
     }
 
-    // view model to be used in knockout.js
+    // view model to be used in knockout.scripts
     export class LooksBaseModel implements ILooksModel{
         dataList:any;
         serviceManager:ServiceManager;

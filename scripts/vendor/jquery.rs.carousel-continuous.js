@@ -15,9 +15,9 @@ undef: true, unused: true, strict: true, trailing: true, browser: true */
  * http://www.gnu.org/licenses/gpl.html
  *
  * Depends:
- *  jquery.js v1.8+
- *  jquery.ui.widget.js v1.8+
- *  jquery.rs.carousel.js v0.11.1
+ *  jquery.scripts v1.8+
+ *  jquery.ui.widget.scripts v1.8+
+ *  jquery.rs.carousel.scripts v0.11.1
  */
  
 (function ($, undefined) {
